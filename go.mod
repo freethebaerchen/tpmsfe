@@ -5,6 +5,7 @@ go 1.25.4
 require (
 	github.com/1Password/connect-sdk-go v1.5.3 // indirect
 	github.com/1password/onepassword-sdk-go v0.4.0-beta.2 // indirect
+	github.com/bitwarden/sdk-go v1.0.2 // indirect
 	github.com/dylibso/observe-sdk/go v0.0.0-20240819160327-2d926c5d788a // indirect
 	github.com/extism/go-sdk v1.7.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
