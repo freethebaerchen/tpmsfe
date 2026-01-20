@@ -20,7 +20,10 @@ func (c *Config) ValidateAndSetDefaults() error {
 		if c.AccountName == "" {
 			c.AccountName = os.Getenv("TPMSFE_OP_ACCOUNT_NAME")
 			if c.AccountName == "" {
-				return ErrAccountNameRequired
+				c.AccountName = os.Getenv("OP_ACCOUNT_NAME")
+				if c.AccountName == "" {
+					return ErrAccountNameRequired
+				}
 			}
 		}
 		return nil
@@ -29,11 +32,11 @@ func (c *Config) ValidateAndSetDefaults() error {
 		if c.ConnectToken == "" {
 			c.ConnectToken = os.Getenv("TPMSFE_OP_CONNECT_TOKEN")
 			if c.ConnectToken == "" {
-				return ErrConnectTokenRequired
+				c.ConnectToken = os.Getenv("OP_CONNECT_TOKEN")
+				if c.ConnectToken == "" {
+					return ErrConnectTokenRequired
+				}
 			}
-		}
-		if c.ConnectEndpoint == "" {
-			c.ConnectEndpoint = "http://127.0.0.1:8080" // Default Connect endpoint
 		}
 		return nil
 
@@ -41,7 +44,10 @@ func (c *Config) ValidateAndSetDefaults() error {
 		if c.ServiceAccountToken == "" {
 			c.ServiceAccountToken = os.Getenv("TPMSFE_OP_SERVICE_ACCOUNT_TOKEN")
 			if c.ServiceAccountToken == "" {
-				return ErrServiceAccountTokenRequired
+				c.ServiceAccountToken = os.Getenv("OP_SERVICE_ACCOUNT_TOKEN")
+				if c.ServiceAccountToken == "" {
+					return ErrServiceAccountTokenRequired
+				}
 			}
 		}
 		return nil

@@ -18,7 +18,7 @@ func FetchSecret(config Config) (string, error) {
 
 // CheckMethod is a convenience function that maintains backward compatibility
 // with the old API signature
-func CheckMethod(method, sessionKey, serverURL, vaultOrFolder, title, accessToken, organizationID, projectID string) (string, error) {
+func CheckMethod(method, sessionKey, serverURL, vaultOrFolder, title, accessToken, clientID, projectID string) (string, error) {
 	config := Config{
 		Method:         method,
 		SessionKey:     sessionKey,
@@ -26,7 +26,7 @@ func CheckMethod(method, sessionKey, serverURL, vaultOrFolder, title, accessToke
 		Vault:          vaultOrFolder,
 		Title:          title,
 		AccessToken:    accessToken,
-		OrganizationID: organizationID,
+		ClientID: 		clientID,
 		ProjectID:      projectID,
 	}
 	return FetchSecret(config)

@@ -15,7 +15,10 @@ func (c *Config) ValidateAndSetDefaults() error {
 	if c.DatabasePath == "" {
 		c.DatabasePath = os.Getenv("TPMSFE_KEEPASSXC_DATABASE")
 		if c.DatabasePath == "" {
-			return ErrDatabasePathRequired
+			c.DatabasePath = os.Getenv("KEEPASSXC_DATABASE")
+			if c.DatabasePath == "" {
+				return ErrDatabasePathRequired
+			}
 		}
 	}
 
@@ -23,7 +26,10 @@ func (c *Config) ValidateAndSetDefaults() error {
 	if c.Password == "" {
 		c.Password = os.Getenv("TPMSFE_KEEPASSXC_PASSWORD")
 		if c.Password == "" {
-			return ErrPasswordOrKeyfileRequired
+			c.Password = os.Getenv("KEEPASSXC_PASSWORD")
+			if c.Password == "" {
+				return ErrPasswordOrKeyfileRequired
+			}
 		}
 	}
 

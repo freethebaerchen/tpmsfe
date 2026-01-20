@@ -39,9 +39,9 @@ func main() {
 	opServiceAccountToken := flag.String("op-service-account-token", "", "The 1Password service account token. Required, when using 1Password service account authentication.")
 	bwAuthMethod := flag.String("bw-auth", "cli", "The authentication method for Bitwarden. Possible values:\n - cli\n - api\n Default is cli")
 	bwSessionKey := flag.String("bw-session", "", "Bitwarden CLI session key. Required when using CLI authentication.")
-	bwApiUrl := flag.String("bw-api-url", "http://localhost", "The Bitwarden API URL. Default is http://localhost")
+	bwApiUrl := flag.String("bw-api-url", "https://bitwarden.com", "The Bitwarden API URL. Default is https://bitwarden.com")
 	bwAccessToken := flag.String("bw-access-token", "", "The Bitwarden access token. Required for Bitwarden authentication.")
-	bwOrgId := flag.String("bw-org-id", "", "The Bitwarden organization ID. Required to access organization secrets.")
+	bwClientId := flag.String("bw-client-id", "", "The Bitwarden organization ID. Required to access organization secrets.")
 	bwProjectId := flag.String("bw-project-id", "", "The Bitwarden project ID. Required to access project secrets.")
 	kxDatabase := flag.String("kx-database", "", "The KeePassXC database path (.kdbx file). Required for KeePassXC.")
 	kxPassword := flag.String("kx-password", "", "The KeePassXC database password. Required if keyfile is not provided.")
@@ -64,7 +64,7 @@ func main() {
 	secret, err := fetchSecret(
 		*provider, *vault, *title,
 		*opAuthMethod, *opAccountName, *opConnectEndpoint, *opConnectToken, *opServiceAccountToken,
-		*bwAuthMethod, *bwSessionKey, *bwApiUrl, *bwAccessToken, *bwOrgId, *bwProjectId,
+		*bwAuthMethod, *bwSessionKey, *bwApiUrl, *bwAccessToken, *bwClientId, *bwProjectId,
 		*kxDatabase, *kxPassword, *kxFieldName,
 	)
 	if err != nil {
@@ -141,19 +141,31 @@ func main() {
 func fetchSecret(
 	provider, vault, title string,
 	opAuthMethod, opAccountName, opConnectEndpoint, opConnectToken, opServiceAccountToken string,
-	bwAuthMethod, bwSessionKey, bwApiUrl, bwAccessToken, bwOrgId, bwProjectId string,
+	bwAuthMethod, bwSessionKey, bwApiUrl, bwAccessToken, bwClientId, bwProjectId string,
 	kxDatabase, kxPassword, kxFieldName string,
 ) (string, error) {
 	if provider == "" {
-		return "", fmt.Errorf("--provider flag is required")
+		provider = os.Getenv("TPMSFE_PROVIDER")
+		if provider == "" {
+			return "", fmt.Errorf("--provider flag or Environment variable TPMSFE_PROVIDER is required")
+		}
 	}
 	if provider == "1password" && vault == "" || provider == "bitwarden" && vault == "" {
-		return "", fmt.Errorf("--vault flag is required")
+		vault = os.Getenv("TPMSFE_VAULT")
+		if vault == "" {
+			return "", fmt.Errorf("--vault flag or Environment variable TPMSFE_VAULT is required")
+		}
 	} else if kxDatabase == "" && provider == "kepassxc" {
-		return "", fmt.Errorf("--kxDatabase flag is required")
+		kxDatabase = os.Getenv("TPMSFE_KX_DATABASE")
+		if kxDatabase == "" {
+			return "", fmt.Errorf("--kxDatabase flag or Environment variable TPMSFE_KX_DATABASE is required")
+		}
 	}
 	if title == "" {
-		return "", fmt.Errorf("--title flag is required")
+		title = os.Getenv("TPMSFE_TITLE")
+		if title == "" {
+			return "", fmt.Errorf("--title flag or Environment variable TPMSFE_TITLE is required")
+		}
 	}
 
 	switch provider {
@@ -175,7 +187,7 @@ func fetchSecret(
 			vault,
 			title,
 			bwAccessToken,
-			bwOrgId,
+			bwClientId,
 			bwProjectId,
 		)
 	case "keepassxc":

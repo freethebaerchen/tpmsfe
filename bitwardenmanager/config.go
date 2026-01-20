@@ -10,7 +10,7 @@ type Config struct {
 	Vault         string // Vault/folder name (for CLI) or organization ID (for API)
 	Title         string // Secret/item title
 	AccessToken   string // For API authentication
-	OrganizationID string // For API authentication
+	ClientID string // For API authentication
 	ProjectID     string // For API authentication (optional)
 }
 
@@ -21,7 +21,10 @@ func (c *Config) ValidateAndSetDefaults() error {
 		if c.SessionKey == "" {
 			c.SessionKey = os.Getenv("TPMSFE_BW_SESSION")
 			if c.SessionKey == "" {
-				return ErrSessionKeyRequired
+				c.SessionKey = os.Getenv("BW_SESSION")
+				if c.SessionKey == "" {
+					return ErrSessionKeyRequired
+				}
 			}
 		}
 		return nil
@@ -30,11 +33,14 @@ func (c *Config) ValidateAndSetDefaults() error {
 		if c.AccessToken == "" {
 			c.AccessToken = os.Getenv("TPMSFE_BW_ACCESS_TOKEN")
 			if c.AccessToken == "" {
-				return ErrAccessTokenRequired
+				c.AccessToken = os.Getenv("BW_ACCESS_TOKEN")
+				if c.AccessToken == "" {
+					return ErrAccessTokenRequired
+				}
 			}
 		}
-		if c.OrganizationID == "" {
-			return ErrOrganizationIDRequired
+		if c.ClientID == "" {
+			return ErrClientIDRequired
 		}
 		return nil
 

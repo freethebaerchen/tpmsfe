@@ -28,10 +28,10 @@ func fetchAPI(config Config) (string, error) {
 		return "", fmt.Errorf("failed to authenticate with Bitwarden SDK: %w", err)
 	}
 
-	// List secrets in organization
-	secrets, err := client.Secrets().List(config.OrganizationID)
+	// List secrets in client
+	secrets, err := client.Secrets().List(config.ClientID)
 	if err != nil {
-		return "", fmt.Errorf("failed to list secrets in organization '%s': %w", config.OrganizationID, err)
+		return "", fmt.Errorf("failed to list secrets in organization '%s': %w", config.ClientID, err)
 	}
 
 	// Find secret by key/title
@@ -44,7 +44,7 @@ func fetchAPI(config Config) (string, error) {
 	}
 
 	if secretID == "" {
-		return "", fmt.Errorf("no secret found with title '%s' in organization '%s'", config.Title, config.OrganizationID)
+		return "", fmt.Errorf("no secret found with title '%s' in organization '%s'", config.Title, config.ClientID)
 	}
 
 	// Get the secret value
