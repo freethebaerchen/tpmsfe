@@ -46,7 +46,7 @@ terraform {
         "--provider", "1password",
         "--op-auth", "service-account"
         // Not recommended:
-        // "--op-service-account-token" "your-sa-token"
+        // "--op-service-account-token", "your-sa-token"
         // Consider using either of the environment variables TPMSFE_OP_SERVICE_ACCOUNT_TOKEN or OP_SERVICE_ACCOUNT_TOKEN
         "--vault", "Your Vault",
         "--title", "Your Item",
@@ -58,7 +58,7 @@ terraform {
         "--provider", "1password",
         "--op-auth", "service-account"
         // Not recommended:
-        // "--op-service-account-token" "your-sa-token"
+        // "--op-service-account-token", "your-sa-token"
         // Consider using either of the environment variables TPMSFE_OP_SERVICE_ACCOUNT_TOKEN or OP_SERVICE_ACCOUNT_TOKEN
         "--vault", "Your Vault",
         "--title", "Your Item",
@@ -89,7 +89,7 @@ terraform {
         "--provider", "1password",
         "--op-auth", "connect"
         // Not recommended:
-        // "--op-connect-token" "your-connect-token"
+        // "--op-connect-token", "your-connect-token"
         // Consider using either of the environment variables TPMSFE_OP_CONNECT_TOKEN or OP_CONNECT_TOKEN
         "--vault", "Your Vault",
         "--title", "Your Item",
@@ -101,7 +101,7 @@ terraform {
         "--provider", "1password",
         "--op-auth", "connect"
         // Not recommended:
-        // "--op-connect-token" "your-connect-token"
+        // "--op-connect-token", "your-connect-token"
         // Consider using either of the environment variables TPMSFE_OP_CONNECT_TOKEN or OP_CONNECT_TOKEN
         "--vault", "Your Vault",
         "--title", "Your Item",
@@ -177,6 +177,9 @@ terraform {
         // "--bw-api-url", "https://bitwarden.eu",
         "--bw-client-id", "Your Client ID",
         // The client ID can als be provided with the environment variables TPMSFE_BW_CLIENT_ID or BW_CLIENT_ID
+        // Not recommended:
+        // "--bw-access-token", "your-access-token"
+        // Consider using either of the environment variables TPMSFE_BW_ACCESS_TOKEN or BW_ACCESS_TOKEN
         "--vault", "Your Vault",
         "--title", "Your Item"
       ]
@@ -189,6 +192,9 @@ terraform {
         // "--bw-api-url", "https://bitwarden.eu",
         "--bw-client-id", "Your Client ID",
         // The client ID can als be provided with the environment variables TPMSFE_BW_CLIENT_ID or BW_CLIENT_ID
+        // Not recommended:
+        // "--bw-access-token", "your-access-token"
+        // Consider using either of the environment variables TPMSFE_BW_ACCESS_TOKEN or BW_ACCESS_TOKEN
         "--vault", "Your Vault",
         "--title", "Your Item"
       ]
@@ -216,7 +222,7 @@ terraform {
         "tpmsfe",
         "--provider", "keepassxc",
         // Not recommended:
-        // "--kx-password" "your-database-password"
+        // "--kx-password", "your-database-password"
         // Consider using either of the environment variables TPMSFE_KX_PASSWORD or KX_PASSWORD
         "--title", "Your Item",
       ]
@@ -225,7 +231,7 @@ terraform {
         "tpmsfe",
         "--provider", "keepassxc",
         // Not recommended:
-        // "--kx-password" "your-database-password"
+        // "--kx-password", "your-database-password"
         // Consider using either of the environment variables TPMSFE_KX_PASSWORD or KX_PASSWORD
         "--title", "Your Item",
       ]
