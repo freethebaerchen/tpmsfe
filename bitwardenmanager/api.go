@@ -7,49 +7,50 @@ import (
 	bitwarden "github.com/bitwarden/sdk-go"
 )
 
-func fetchBitwardenAPI(apiURL, accessToken, organizationID, projectID, title string) (string, error) {
+// fetchAPI fetches a secret using the Bitwarden SDK/API
+func fetchAPI(config Config) (string, error) {
 	// Set API URL if provided
-	if apiURL != "" {
-		os.Setenv("BITWARDEN_API_URL", apiURL)
-		os.Setenv("BITWARDEN_IDENTITY_API_URL", apiURL)
+	if config.ServerURL != "" {
+		os.Setenv("BITWARDEN_API_URL", config.ServerURL)
+		os.Setenv("BITWARDEN_IDENTITY_API_URL", config.ServerURL)
 	}
 
 	// Initialize Bitwarden client
 	client, err := bitwarden.NewBitwardenClient(nil, nil)
 	if err != nil {
-		return "", fmt.Errorf("failed to initialize Bitwarden client: %w", err)
+		return "", fmt.Errorf("failed to initialize Bitwarden SDK client: %w", err)
 	}
 	defer client.Close()
 
 	// Authenticate with access token
-	err = client.AccessTokenLogin(accessToken, nil)
+	err = client.AccessTokenLogin(config.AccessToken, nil)
 	if err != nil {
-		return "", fmt.Errorf("failed to authenticate with Bitwarden: %w", err)
+		return "", fmt.Errorf("failed to authenticate with Bitwarden SDK: %w", err)
 	}
 
 	// List secrets in organization
-	secrets, err := client.Secrets().List(organizationID)
+	secrets, err := client.Secrets().List(config.OrganizationID)
 	if err != nil {
-		return "", fmt.Errorf("failed to list secrets: %w", err)
+		return "", fmt.Errorf("failed to list secrets in organization '%s': %w", config.OrganizationID, err)
 	}
 
 	// Find secret by key/title
 	var secretID string
 	for _, secret := range secrets.Data {
-		if secret.Key == title {
+		if secret.Key == config.Title {
 			secretID = secret.ID
 			break
 		}
 	}
-	
+
 	if secretID == "" {
-		return "", fmt.Errorf("No secret found with title '%s' in organization '%s'", title, organizationID)
+		return "", fmt.Errorf("no secret found with title '%s' in organization '%s'", config.Title, config.OrganizationID)
 	}
 
 	// Get the secret value
 	secret, err := client.Secrets().Get(secretID)
 	if err != nil {
-		return "", fmt.Errorf("failed to fetch secret from Bitwarden: %w", err)
+		return "", fmt.Errorf("failed to fetch secret '%s' from Bitwarden SDK: %w", config.Title, err)
 	}
 
 	return secret.Value, nil

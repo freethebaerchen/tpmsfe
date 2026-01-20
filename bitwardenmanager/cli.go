@@ -3,43 +3,72 @@ package bitwardenmanager
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 	"os/exec"
 	"strings"
 )
 
-func fetchBitwardenCLI(sessionKey, serverURL, folderName, title string) (string, error) {
-	// Use bw CLI with session key (from `bw unlock`)
-	if sessionKey == "" {
-		sessionKey = os.Getenv("TPMSFE_BW_SESSION")
-	}
-	if sessionKey == "" {
-		return "", fmt.Errorf("Bitwarden session key required. Run 'bw unlock' and provide session key")
+// fetchCLI fetches a secret using the Bitwarden CLI
+func fetchCLI(config Config) (string, error) {
+	// Sync vault to ensure we have latest data
+	if err := syncVault(config.SessionKey); err != nil {
+		return "", fmt.Errorf("failed to sync Bitwarden vault: %w", err)
 	}
 
-	// Set server URL if provided
-	if serverURL != "" && serverURL != "https://vault.bitwarden.com" {
-		configCmd := exec.Command("bw", "config", "server", serverURL)
-		if err := configCmd.Run(); err != nil {
-			return "", fmt.Errorf("failed to set Bitwarden server URL: %w", err)
-		}
+	// First, try the simple approach: get password directly (works for login items)
+	if password, err := getPasswordDirect(config); err == nil {
+		return password, nil
 	}
 
-	// Get item by title
-	cmd := exec.Command("bw", "get", "item", title, "--session", sessionKey)
+	// If that fails, search for the item and get full details (needed for custom fields)
+	return getPasswordFromItem(config)
+}
+
+// syncVault syncs the Bitwarden vault to ensure we have the latest data
+func syncVault(sessionKey string) error {
+	cmd := exec.Command("bw", "sync")
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf("bw sync failed: %w", err)
+	}
+	return nil
+}
+
+// getPasswordDirect tries to get password directly using 'bw get password'
+// This is simpler and faster for login items
+func getPasswordDirect(config Config) (string, error) {
+	cmd := exec.Command("bw", "get", "password", config.Title)
 	output, err := cmd.Output()
 	if err != nil {
-		// Try to get more specific error message
-		if exitErr, ok := err.(*exec.ExitError); ok && len(exitErr.Stderr) > 0 {
-			return "", fmt.Errorf("failed to fetch item from Bitwarden: %s", string(exitErr.Stderr))
-		}
-		return "", fmt.Errorf("failed to fetch item from Bitwarden: %w", err)
+		return "", fmt.Errorf("direct password fetch failed: %w", err)
+	}
+
+	password := strings.TrimSpace(string(output))
+	if password == "" {
+		return "", fmt.Errorf("empty password returned for item '%s'", config.Title)
+	}
+
+	return password, nil
+}
+
+// getPasswordFromItem searches for the item and extracts password from login or custom fields
+func getPasswordFromItem(config Config) (string, error) {
+	// Search for items matching the title
+	itemID, err := findItemID(config.Title, config.SessionKey)
+	if err != nil {
+		return "", fmt.Errorf("failed to find item '%s': %w", config.Title, err)
+	}
+
+	// Get the full item details
+	cmd := exec.Command("bw", "get", "item", itemID, "--session", config.SessionKey)
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("failed to fetch item '%s': %w", config.Title, err)
 	}
 
 	// Parse JSON response
 	var item struct {
-		Name   string `json:"name"`
-		Login  *struct {
+		ID    string `json:"id"`
+		Name  string `json:"name"`
+		Login *struct {
 			Password string `json:"password"`
 		} `json:"login"`
 		Fields []struct {
@@ -49,12 +78,12 @@ func fetchBitwardenCLI(sessionKey, serverURL, folderName, title string) (string,
 	}
 
 	if err := json.Unmarshal(output, &item); err != nil {
-		return "", fmt.Errorf("failed to parse Bitwarden response: %w", err)
+		return "", fmt.Errorf("failed to parse Bitwarden CLI response: %w", err)
 	}
 
-	// Check if we got the right item
-	if item.Name != title {
-		return "", fmt.Errorf("item name mismatch: expected '%s', got '%s'", title, item.Name)
+	// Verify we got the right item
+	if item.Name != config.Title {
+		return "", fmt.Errorf("item name mismatch: expected '%s', got '%s'", config.Title, item.Name)
 	}
 
 	// Try to get password from login field first
@@ -70,5 +99,39 @@ func fetchBitwardenCLI(sessionKey, serverURL, folderName, title string) (string,
 		}
 	}
 
-	return "", fmt.Errorf("neither 'password' nor 'credential' field found in item '%s'", title)
+	return "", fmt.Errorf("neither 'password' nor 'credential' field found in item '%s'", config.Title)
+}
+
+// findItemID searches for an item by name and returns its ID
+func findItemID(title, sessionKey string) (string, error) {
+	cmd := exec.Command("bw", "list", "items", "--session", sessionKey, "--search", title)
+	output, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("failed to search for items: %w", err)
+	}
+
+	var items []struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	}
+
+	if err := json.Unmarshal(output, &items); err != nil {
+		return "", fmt.Errorf("failed to parse search results: %w", err)
+	}
+
+	// Find exact match (case-sensitive)
+	for _, item := range items {
+		if item.Name == title {
+			return item.ID, nil
+		}
+	}
+
+	// Try case-insensitive match
+	for _, item := range items {
+		if strings.EqualFold(item.Name, title) {
+			return item.ID, nil
+		}
+	}
+
+	return "", fmt.Errorf("item '%s' not found", title)
 }

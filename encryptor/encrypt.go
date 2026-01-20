@@ -8,23 +8,17 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io"
-	"os"
-	"strings"
 
 	"golang.org/x/crypto/pbkdf2"
 )
 
-func EncryptFileContent(password string, filePath string) error {
-	// Read plaintext file
-	plainText, err := os.ReadFile(filePath)
-	if err != nil {
-		return fmt.Errorf("read file err: %v", err)
-	}
-
+// EncryptBytes encrypts raw bytes using AES-256-GCM with PBKDF2 key derivation
+// Returns the encrypted data as base64-encoded string (salt + ciphertext)
+func EncryptBytes(password string, plainText []byte) (string, error) {
 	// Generate random salt
 	salt := make([]byte, 32)
 	if _, err := io.ReadFull(rand.Reader, salt); err != nil {
-		return fmt.Errorf("salt generation err: %v", err)
+		return "", fmt.Errorf("salt generation err: %v", err)
 	}
 
 	// Derive a 32-byte key from the password (for AES-256)
@@ -33,19 +27,19 @@ func EncryptFileContent(password string, filePath string) error {
 	// Create AES cipher with derived key
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return fmt.Errorf("cipher err: %v", err)
+		return "", fmt.Errorf("cipher err: %v", err)
 	}
 
 	// Create GCM mode
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		return fmt.Errorf("cipher GCM err: %v", err)
+		return "", fmt.Errorf("cipher GCM err: %v", err)
 	}
 
 	// Generate random nonce
 	nonce := make([]byte, gcm.NonceSize())
 	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-		return fmt.Errorf("nonce err: %v", err)
+		return "", fmt.Errorf("nonce err: %v", err)
 	}
 
 	// Encrypt the plaintext
@@ -57,31 +51,5 @@ func EncryptFileContent(password string, filePath string) error {
 	// Base64 encode the encrypted data
 	encodedData := base64.StdEncoding.EncodeToString(finalData)
 
-	// Format with line breaks every 64 characters
-	formattedData := formatBase64(encodedData)
-
-	// Write formatted content to file
-	err = os.WriteFile(filePath, []byte(formattedData), 0644)
-	if err != nil {
-		return fmt.Errorf("write file err: %v", err)
-	}
-
-	return nil
-}
-
-func formatBase64(encoded string) string {
-	var formatted strings.Builder
-
-	for i := 0; i < len(encoded); i += 64 {
-		end := i + 64
-		if end > len(encoded) {
-			end = len(encoded)
-		}
-		formatted.WriteString(encoded[i:end])
-		if end < len(encoded) {
-			formatted.WriteString("\n")
-		}
-	}
-
-	return formatted.String()
+	return encodedData, nil
 }
