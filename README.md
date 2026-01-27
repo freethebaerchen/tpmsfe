@@ -165,6 +165,7 @@ terraform {
 ```
 
 ### Terraform snippet for configuration (API):
+#### This is not tested, since Vaultwarden only supports the client API
 ```tf
 terraform {
   encryption {
