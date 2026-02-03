@@ -43,9 +43,6 @@ RUN groupadd -g ${GID} nonroot && \
 USER nonroot
 
 COPY --from=certificates /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-COPY --from=jq /usr/local/bin/jq /usr/local/bin/jq
-COPY --from=talosctl /usr/local/bin/talosctl /usr/local/bin/talosctl
-COPY --from=packer /usr/bin/packer /usr/local/bin/packer
 COPY --from=tpmsfe /app/tpmsfe /usr/local/bin/tpmsfe
 COPY --from=opentofu /opt/opentofu/tofu /usr/local/bin/tofu
 
