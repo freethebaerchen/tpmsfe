@@ -6,7 +6,7 @@ terraform {
         "--provider", "bitwarden",
         "--bw-auth", "cli",
         "--vault", "Test",
-        "--title", "OpenTofu-Encryption-Key"
+        "--title", "terraform-state-secret"
       ]
 
       decrypt_command = [
@@ -14,7 +14,7 @@ terraform {
         "--provider", "bitwarden",
         "--bw-auth", "cli",
         "--vault", "Test",
-        "--title", "OpenTofu-Encryption-Key"
+        "--title", "terraform-state-secret"
       ]
     }
 
