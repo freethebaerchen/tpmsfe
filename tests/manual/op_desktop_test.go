@@ -3,7 +3,7 @@ package onepasswordmanager
 import (
 	"testing"
 
-	opentofu "github.com/freethebaerchen/tpmsfe/opentofu"
+	opentofu "github.com/freethebaerchen/tpmsfe/tests"
 )
 
 func TestOnepasswordDesktop(t *testing.T) {

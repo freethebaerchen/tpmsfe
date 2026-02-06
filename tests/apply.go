@@ -1,5 +1,4 @@
-// +build test
-package opentofu
+package tests
 
 import (
 	"bytes"
@@ -55,4 +54,3 @@ func parseOutput(output string) string {
 
 	return strings.Trim(fields[2], `"`)
 }
-

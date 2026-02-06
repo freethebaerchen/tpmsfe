@@ -1,5 +1,4 @@
-// +build test
-package opentofu
+package tests
 
 import (
 	"bufio"

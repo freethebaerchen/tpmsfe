@@ -6,8 +6,8 @@ import (
 	opentofu "github.com/freethebaerchen/tpmsfe/tests"
 )
 
-func TestOnepasswordServiceAccount(t *testing.T) {
-	projectPath := "/Users/jochen/Projects/tpmsfe/opentofu-test-project/password_managers/onepassword/service_account"
+func TestOnepasswordConnect(t *testing.T) {
+	projectPath := "/Users/jochen/Projects/tpmsfe/opentofu-test-project/password_managers/onepassword/connect"
 	outputs, err := opentofu.TofuApply(projectPath)
 	if err != nil {
 		t.Fatalf("TofuApply failed: %v", err)
