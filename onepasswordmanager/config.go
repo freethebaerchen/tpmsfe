@@ -42,6 +42,9 @@ func (c *Config) ValidateAndSetDefaults() error {
 			c.ConnectEndpoint = os.Getenv("TPMSFE_OP_CONNECT_HOST")
 			if c.ConnectEndpoint == "" {
 				c.ConnectEndpoint = os.Getenv("OP_CONNECT_HOST")
+				if c.ConnectEndpoint == "" {
+					c.ConnectEndpoint = "http://localhost:8080"
+				}
 			}
 		}
 		return nil
