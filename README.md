@@ -224,7 +224,7 @@ terraform {
         "--provider", "keepassxc",
         // Not recommended:
         // "--kx-password", "your-database-password"
-        // Consider using either of the environment variables TPMSFE_KX_PASSWORD or KX_PASSWORD
+        // Consider using either of the environment variables  TPMSFE_KEEPASSXC_PASSWORD or  KEEPASSXC_PASSWORD
         "--title", "Your Item",
       ]
       
@@ -233,7 +233,7 @@ terraform {
         "--provider", "keepassxc",
         // Not recommended:
         // "--kx-password", "your-database-password"
-        // Consider using either of the environment variables TPMSFE_KX_PASSWORD or KX_PASSWORD
+        // Consider using either of the environment variables  TPMSFE_KEEPASSXC_PASSWORD or  KEEPASSXC_PASSWORD
         "--title", "Your Item",
       ]
     }
