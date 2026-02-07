@@ -1,13 +1,15 @@
 package automatictests
 
 import (
+	"os"
 	"testing"
 
 	opentofu "github.com/freethebaerchen/tpmsfe/tests"
 )
 
-func TestBitwardenCLI(t *testing.T) {
-	projectPath := "/Users/jochen/Projects/tpmsfe/opentofu-test-project/password_managers/bitwarden/cli"
+func TestOnepasswordConnect(t *testing.T) {
+	currentDir := os.Getenv("PWD")
+	projectPath := currentDir + "/../../opentofu-test-project/password_managers/onepassword/connect"
 	outputs, err := opentofu.TofuApply(projectPath)
 	if err != nil {
 		t.Fatalf("TofuApply failed: %v", err)
