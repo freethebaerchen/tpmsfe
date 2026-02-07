@@ -34,7 +34,7 @@ func main() {
 	title := flag.String("title", "", "The title of the password entry you want to use. Default is none")
 	opAuthMethod := flag.String("op-auth", "desktop", "The authentication method for 1Password. Possible values:\n - desktop\n - service-account\n - connect\n Default is desktop")
 	opAccountName := flag.String("op-account", "", "The 1Password account name. Required, when using 1Password Desktop.")
-	opConnectEndpoint := flag.String("op-connect-endpoint", "http://127.0.0.1:8080", "The 1Password Connect endpoint. Required, when using 1Password Connect. Default is http://127.0.0.1:8080")
+	opConnectEndpoint := flag.String("op-connect-endpoint", "", "The 1Password Connect endpoint. Required, when using 1Password Connect. Default is http://localhost:8080")
 	opConnectToken := flag.String("op-connect-token", "", "The 1Password Connect token. Required, when using 1Password Connect.")
 	opServiceAccountToken := flag.String("op-service-account-token", "", "The 1Password service account token. Required, when using 1Password service account authentication.")
 	bwAuthMethod := flag.String("bw-auth", "cli", "The authentication method for Bitwarden. Possible values:\n - cli\n - api\n Default is cli")
@@ -150,7 +150,7 @@ func fetchSecret(
 			return "", fmt.Errorf("--provider flag or Environment variable TPMSFE_PROVIDER is required")
 		}
 	}
-	if provider == "1password" && vault == "" || provider == "bitwarden" && vault == "" {
+	if provider == "1password" && vault == "" {
 		vault = os.Getenv("TPMSFE_VAULT")
 		if vault == "" {
 			return "", fmt.Errorf("--vault flag or Environment variable TPMSFE_VAULT is required")
@@ -191,13 +191,8 @@ func fetchSecret(
 			bwProjectId,
 		)
 	case "keepassxc":
-		// For KeePassXC: vault is database path, title is entry path
-		databasePath := vault
-		if kxDatabase != "" {
-			databasePath = kxDatabase
-		}
 		return keepassxcmanager.CheckMethod(
-			databasePath,
+			kxDatabase,
 			kxPassword,
 			title,
 			kxFieldName,

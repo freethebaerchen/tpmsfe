@@ -106,6 +106,9 @@ terraform {
         "--vault", "Your Vault",
         "--title", "Your Item",
         "--op-account", "Your Company/Your Account name"
+        // OPTIONAL: Connect Endpoint:
+        // "--op-connect-endpoint", "http(s)://connect.example.com:8080"
+        // Can also be set via TPMSFE_OP_CONNECT_HOST or OP_CONNECT_HOST
       ]
     }
 
@@ -224,7 +227,7 @@ terraform {
         "--provider", "keepassxc",
         // Not recommended:
         // "--kx-password", "your-database-password"
-        // Consider using either of the environment variables TPMSFE_KX_PASSWORD or KX_PASSWORD
+        // Consider using either of the environment variables  TPMSFE_KEEPASSXC_PASSWORD or  KEEPASSXC_PASSWORD
         "--title", "Your Item",
       ]
       
@@ -233,7 +236,7 @@ terraform {
         "--provider", "keepassxc",
         // Not recommended:
         // "--kx-password", "your-database-password"
-        // Consider using either of the environment variables TPMSFE_KX_PASSWORD or KX_PASSWORD
+        // Consider using either of the environment variables  TPMSFE_KEEPASSXC_PASSWORD or  KEEPASSXC_PASSWORD
         "--title", "Your Item",
       ]
     }
