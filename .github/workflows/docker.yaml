@@ -15,6 +15,7 @@ jobs:
           - custom
           - tofu
           - minimal
+          - cicd
     steps:
       - name: Checkout
         uses: actions/checkout@v6
