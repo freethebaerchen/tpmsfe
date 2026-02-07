@@ -17,7 +17,7 @@ WORKDIR /workdir
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends ca-certificates golang kpcli && \
+    apt-get install -y --no-install-recommends ca-certificates golang kpcli gcc libc6-dev && \
     rm -rf /var/lib/apt/lists/*
 
 RUN npm install -g @bitwarden/cli
