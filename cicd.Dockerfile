@@ -22,11 +22,6 @@ RUN apt-get update && \
 
 RUN npm install -g @bitwarden/cli
 
-RUN groupadd -g ${GID} nonroot && \
-    useradd -u ${UID} -g ${GID} -m -s /bin/bash nonroot
-
-USER nonroot
-
 COPY --from=opentofu /opt/opentofu/tofu /usr/local/bin/tofu
 COPY --from=1password/op:2 /usr/local/bin/op /usr/local/bin/op
 COPY --from=minio/mc:latest /bin/mc /usr/local/bin/mc
