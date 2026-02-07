@@ -31,7 +31,7 @@ jobs:
           SETUP_S3_ENDPOINT: op://tpmsfe/S3-Credentials/endpoint
 
       - name: Get Keepass Database
-        run:
+        run: |
           mc alias set actions ${{ steps.op-load-secret.outputs.SETUP_S3_ENDPOINT }} ${{ steps.op-load-secret.outputs.SETUP_S3_ACCESS_KEY_ID }} ${{ steps.op-load-secret.outputs.SETUP_S3_SECRET_ACCESS_KEY }}
           mc cp actions/tpmsfe/Passwords.kdbx /kp/Passwords.kdbx
 
