@@ -12,6 +12,9 @@ FROM node:trixie-slim
 ARG UID=60000
 ARG GID=60000
 
+ENV CGO_ENABLED=1
+ENV CGO_LDFLAGS="-lm"
+
 WORKDIR /workdir
 
 ARG DEBIAN_FRONTEND=noninteractive
