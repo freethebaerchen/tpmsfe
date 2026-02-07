@@ -38,6 +38,12 @@ func (c *Config) ValidateAndSetDefaults() error {
 				}
 			}
 		}
+		if c.ConnectEndpoint == "" {
+			c.ConnectEndpoint = os.Getenv("TPMSFE_OP_CONNECT_HOST")
+			if c.ConnectEndpoint == "" {
+				c.ConnectEndpoint = os.Getenv("OP_CONNECT_HOST")
+			}
+		}
 		return nil
 
 	case "service-account":
