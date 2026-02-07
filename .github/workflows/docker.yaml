@@ -21,6 +21,7 @@ jobs:
 
       - name: Load Docker credentials from 1Password
         uses: 1password/load-secrets-action@v2
+        id: op-load-secret
         with:
             export-env: false
         env:
