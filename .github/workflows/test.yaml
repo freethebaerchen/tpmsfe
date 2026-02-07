@@ -22,9 +22,9 @@ jobs:
           TPMSFE_OP_CONNECT_TOKEN: "op://tpmsfe/tpmsfe-test Connect Token: tpmsfe-test/credential"
           TPMSFE_OP_CONNECT_HOST: "op://tpmsfe/tpmsfe-test Connect Token: tpmsfe-test/endpoint"
           TPMSFE_OP_SERVICE_ACCOUNT_TOKEN: "op://tpmsfe/Service Account Auth Token: TPMSFE-Test/credential"
-          SETUP_BW_USERNAME: "op://tpmsfe/Vaultwarden/username"
-          SETUP_BW_PASSWORD: "op://tpmsfe/Vaultwarden/password"
-          SETUP_BW_SERVER: "op://tpmsfe/Vaultwarden/endpoint"
+          # SETUP_BW_USERNAME: "op://tpmsfe/Vaultwarden/username"
+          # SETUP_BW_PASSWORD: "op://tpmsfe/Vaultwarden/password"
+          # SETUP_BW_SERVER: "op://tpmsfe/Vaultwarden/endpoint"
           SETUP_S3_ACCESS_KEY_ID: "op://tpmsfe/S3-Credentials/username"
           SETUP_S3_SECRET_ACCESS_KEY: "op://tpmsfe/S3-Credentials/password"
           SETUP_S3_ENDPOINT: "op://tpmsfe/S3-Credentials/endpoint"
@@ -34,11 +34,11 @@ jobs:
           mc alias set actions ${{ steps.op-load-secret.outputs.SETUP_S3_ENDPOINT }} ${{ steps.op-load-secret.outputs.SETUP_S3_ACCESS_KEY_ID }} ${{ steps.op-load-secret.outputs.SETUP_S3_SECRET_ACCESS_KEY }}
           mc cp actions/tpmsfe/Passwords.kdbx /kp/Passwords.kdbx
 
-      - name: Create Bitwarden Session
-        run: |
-          bw config server ${{ steps.op-load-secret.outputs.SETUP_BW_SERVER }}
-          echo "TPMSFE_BW_SESSION=$(bw login "${{ steps.op-load-secret.outputs.SETUP_BW_USERNAME }}" "${{ steps.op-load-secret.outputs.SETUP_BW_PASSWORD }}" --raw)" >> $GITHUB_ENV
-          bw sync
+      # - name: Create Bitwarden Session
+      #   run: |
+      #     bw config server ${{ steps.op-load-secret.outputs.SETUP_BW_SERVER }}
+      #     echo "TPMSFE_BW_SESSION=$(bw login "${{ steps.op-load-secret.outputs.SETUP_BW_USERNAME }}" "${{ steps.op-load-secret.outputs.SETUP_BW_PASSWORD }}" --raw)" >> $GITHUB_ENV
+      #     bw sync
 
       - name: Checkout repository
         uses: actions/checkout@v6
