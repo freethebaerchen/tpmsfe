@@ -4,13 +4,15 @@ terraform {
       encrypt_command = [
         "tpmsfe",
         "--provider", "keepassxc",
-        "--title", "Your Item",
+        "--title", "terraform-state-secret",
+        "--kx-database", "/kp/Passwords.kdbx"
       ]
       
       decrypt_command = [
         "tpmsfe",
         "--provider", "keepassxc",
-        "--title", "Your Item",
+        "--title", "terraform-state-secret",
+        "--kx-database", "/kp/Passwords.kdbx"
       ]
     }
 

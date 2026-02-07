@@ -5,7 +5,6 @@ terraform {
         "tpmsfe",
         "--provider", "bitwarden",
         "--bw-auth", "cli",
-        "--vault", "Test",
         "--title", "terraform-state-secret"
       ]
 
@@ -13,7 +12,6 @@ terraform {
         "tpmsfe",
         "--provider", "bitwarden",
         "--bw-auth", "cli",
-        "--vault", "Test",
         "--title", "terraform-state-secret"
       ]
     }
