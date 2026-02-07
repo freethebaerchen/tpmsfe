@@ -12,6 +12,7 @@ jobs:
       image: bubatzlegal/tpmsfe:cicd
     steps:
       - name: Load secrets from 1Password
+        id: op-load-secret
         uses: 1password/load-secrets-action@v2
         with:
             export-env: true
