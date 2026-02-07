@@ -16,6 +16,7 @@ jobs:
         with:
             export-env: false
         env:
+          OP_CONFIG_DIR: /tmp/op
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
           TPMSFE_KEEPASSXC_PASSWORD: "op://tpmsfe/KeePassXC/password"
           TPMSFE_OP_CONNECT_TOKEN: "op://tpmsfe/tpmsfe-test Connect Token: tpmsfe-test/credential"
