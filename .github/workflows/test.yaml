@@ -44,5 +44,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Build tpmsfe binary
+        run: go build -o /usr/local/bin/tpmsfe .
+
       - name: Run go (automated) tests
         run: go test ./tests/automatic
