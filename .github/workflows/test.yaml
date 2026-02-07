@@ -31,5 +31,8 @@ jobs:
           echo "TPMSFE_BW_SESSION=$(bw login "${{ steps.op-load-secret.outputs.SETUP_BW_USERNAME }}" "${{ steps.op-load-secret.outputs.SETUP_BW_PASSWORD }}" --raw)" >> $GITHUB_ENV
           bw sync
 
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
       - name: Run go (automated) tests
         run: go test ./tests/automatic
