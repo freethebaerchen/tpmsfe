@@ -191,13 +191,8 @@ func fetchSecret(
 			bwProjectId,
 		)
 	case "keepassxc":
-		// For KeePassXC: vault is database path, title is entry path
-		databasePath := vault
-		if kxDatabase != "" {
-			databasePath = kxDatabase
-		}
 		return keepassxcmanager.CheckMethod(
-			databasePath,
+			kxDatabase,
 			kxPassword,
 			title,
 			kxFieldName,
