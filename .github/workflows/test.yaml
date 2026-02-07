@@ -13,8 +13,8 @@ jobs:
     steps:
       - name: Load secrets from 1Password
         uses: 1password/load-secrets-action@v2
-        # with:
-        #     export-env: false
+        with:
+            export-env: true
         env:
           OP_CONFIG_DIR: /tmp/op
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
