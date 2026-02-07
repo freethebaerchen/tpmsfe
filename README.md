@@ -106,6 +106,9 @@ terraform {
         "--vault", "Your Vault",
         "--title", "Your Item",
         "--op-account", "Your Company/Your Account name"
+        // OPTIONAL: Connect Endpoint:
+        // "--op-connect-endpoint", "http(s)://connect.example.com:8080"
+        // Can also be set via TPMSFE_OP_CONNECT_HOST or OP_CONNECT_HOST
       ]
     }
 
