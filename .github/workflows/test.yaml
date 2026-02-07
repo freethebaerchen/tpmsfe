@@ -15,7 +15,7 @@ jobs:
         id: op-load-secret
         uses: 1password/load-secrets-action@v2
         with:
-          export-env: false
+          export-env: true
         env:
           # OP_CONFIG_DIR: /tmp/op
           OP_SERVICE_ACCOUNT_TOKEN: ${{ secrets.OP_SERVICE_ACCOUNT_TOKEN }}
@@ -32,13 +32,13 @@ jobs:
 
       - name: Get Keepass Database
         run: |
-          mc alias set actions ${{ steps.op-load-secret.outputs.SETUP_S3_ENDPOINT }} ${{ steps.op-load-secret.outputs.SETUP_S3_ACCESS_KEY_ID }} ${{ steps.op-load-secret.outputs.SETUP_S3_SECRET_ACCESS_KEY }}
+          mc alias set actions $SETUP_S3_ENDPOINT $SETUP_S3_ACCESS_KEY_ID $SETUP_S3_SECRET_ACCESS_KEY
           mc cp actions/tpmsfe/Passwords.kdbx /kp/Passwords.kdbx
 
       - name: Create Bitwarden Session
         run: |
-          bw config server ${{ steps.op-load-secret.outputs.SETUP_BW_SERVER }}
-          echo "TPMSFE_BW_SESSION=$(bw login "${{ steps.op-load-secret.outputs.SETUP_BW_USERNAME }}" "${{ steps.op-load-secret.outputs.SETUP_BW_PASSWORD }}" --raw)" >> $GITHUB_ENV
+          bw config server $SETUP_BW_SERVER
+          echo "TPMSFE_BW_SESSION=$(bw login "$SETUP_BW_USERNAME" "$SETUP_BW_PASSWORD" --raw)" >> $GITHUB_ENV
           bw sync
 
       - name: Checkout repository
