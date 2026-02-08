@@ -15,6 +15,16 @@ type Config struct {
 
 // ValidateAndSetDefaults validates the config and sets defaults from environment variables
 func (c *Config) ValidateAndSetDefaults() error {
+	if c.Method == "" {
+		c.AccountName = os.Getenv("TPMSFE_OP_AUTH_METHOD")
+		if c.AccountName == "" {
+			c.AccountName = os.Getenv("OP_AUTH_METHOD")
+			if c.AccountName == "" {
+				return ErrAuthMethodRequired
+			}
+		}
+	}
+
 	switch c.Method {
 	case "desktop":
 		if c.AccountName == "" {
@@ -62,6 +72,6 @@ func (c *Config) ValidateAndSetDefaults() error {
 		return nil
 
 	default:
-		return ErrUnsupportedMethod
+		return ErrAuthMethodRequired
 	}
 }
