@@ -1,8 +1,23 @@
-# (Open)Tofu Password Manager State File Encryption (TPMSFE)
+# TPMSFE – (Open)Tofu Password Manager State File Encryption
 
-## 1Password
-### Terraform snippet for configuration (Desktop):
-```tf
+TPMSFE is an external encryption helper for **OpenTofu** and **Terraform** state and plan files. It uses a secret stored in a password manager (1Password, Bitwarden, or KeePassXC) to derive an encryption key and encrypt/decrypt payloads with AES-256-GCM. OpenTofu invokes the same binary for both encrypt and decrypt via the `encryption { method "external" ... }` block.
+
+## Features
+
+- Works with OpenTofu (and Terraform) external encryption API: single binary for both encrypt and decrypt.
+- **1Password:** Desktop app, Connect server, or Service Account.
+- **Bitwarden:** CLI session, compatible with self-hosted/Vaultwarden for CLI. API is, as of right now, unsupported, since Vaultwarden doesn't support the Client API.
+- **KeePassXC:** Local `.kdbx` database; secret read via KeePassXC CLI.
+- Encryption: AES-256-GCM; key derived with PBKDF2 (100,000 iterations, SHA-256).
+- Configuration via command-line flags and/or environment variables; no secrets in `.tf` when using env vars.
+
+## Quick start
+
+1. **Install** the `tpmsfe` binary (see [Installation](docs/installation.md)).
+2. **Create a secret** in your password manager (e.g. a Secure Note in 1Password, an item in Bitwarden, or an entry in KeePassXC). This value will be the encryption key material.
+3. **Add the encryption block** to your Terraform/OpenTofu root module. Example for 1Password desktop:
+
+```hcl
 terraform {
   encryption {
     method "external" "tpmsfe" {
@@ -11,15 +26,15 @@ terraform {
         "--provider", "1password",
         "--vault", "Your Vault",
         "--title", "Your Item",
-        "--op-account", "Your Company/Your Account name"
+        "--op-account", "Your Company/Your Account"
       ]
-      
+
       decrypt_command = [
         "tpmsfe",
         "--provider", "1password",
         "--vault", "Your Vault",
         "--title", "Your Item",
-        "--op-account", "Your Company/Your Account name"
+        "--op-account", "Your Company/Your Account"
       ]
     }
 
@@ -36,221 +51,23 @@ terraform {
 }
 ```
 
-### Terraform snippet for configuration (Service Account):
-```tf
-terraform {
-  encryption {
-    method "external" "tpmsfe" {
-      encrypt_command = [
-        "tpmsfe",
-        "--provider", "1password",
-        "--op-auth", "service-account"
-        // Not recommended:
-        // "--op-service-account-token", "your-sa-token"
-        // Consider using either of the environment variables TPMSFE_OP_SERVICE_ACCOUNT_TOKEN or OP_SERVICE_ACCOUNT_TOKEN
-        "--vault", "Your Vault",
-        "--title", "Your Item",
-        "--op-account", "Your Company/Your Account name"
-      ]
-      
-      decrypt_command = [
-        "tpmsfe",
-        "--provider", "1password",
-        "--op-auth", "service-account"
-        // Not recommended:
-        // "--op-service-account-token", "your-sa-token"
-        // Consider using either of the environment variables TPMSFE_OP_SERVICE_ACCOUNT_TOKEN or OP_SERVICE_ACCOUNT_TOKEN
-        "--vault", "Your Vault",
-        "--title", "Your Item",
-        "--op-account", "Your Company/Your Account name"
-      ]
-    }
+4. Run `tofu init`, `tofu plan`, `tofu apply` as usual. State and plan files are encrypted using the secret from your password manager.
 
-    state {
-      method   = method.external.tpmsfe
-      enforced = true
-    }
+## Documentation
 
-    plan {
-      method   = method.external.tpmsfe
-      enforced = true
-    }
-  }
-}
-```
+Full documentation is in the [docs](docs/README.md) directory:
 
-### Terraform snippet for configuration (Service Account):
-```tf
-terraform {
-  encryption {
-    method "external" "tpmsfe" {
-      encrypt_command = [
-        "tpmsfe",
-        "--provider", "1password",
-        "--op-auth", "connect"
-        // Not recommended:
-        // "--op-connect-token", "your-connect-token"
-        // Consider using either of the environment variables TPMSFE_OP_CONNECT_TOKEN or OP_CONNECT_TOKEN
-        "--vault", "Your Vault",
-        "--title", "Your Item",
-        "--op-account", "Your Company/Your Account name"
-      ]
-      
-      decrypt_command = [
-        "tpmsfe",
-        "--provider", "1password",
-        "--op-auth", "connect"
-        // Not recommended:
-        // "--op-connect-token", "your-connect-token"
-        // Consider using either of the environment variables TPMSFE_OP_CONNECT_TOKEN or OP_CONNECT_TOKEN
-        "--vault", "Your Vault",
-        "--title", "Your Item",
-        "--op-account", "Your Company/Your Account name"
-        // OPTIONAL: Connect Endpoint:
-        // "--op-connect-endpoint", "http(s)://connect.example.com:8080"
-        // Can also be set via TPMSFE_OP_CONNECT_HOST or OP_CONNECT_HOST
-      ]
-    }
+| Document | Description |
+|----------|-------------|
+| [Installation](docs/installation.md) | Build from source, Docker images |
+| [Configuration](docs/configuration.md) | Encryption block, flags, how encryption works |
+| [Docker](docs/docker.md) | Image variants and usage |
+| [1Password](docs/providers/1password.md) | Desktop, Connect, Service Account |
+| [Bitwarden](docs/providers/bitwarden.md) | CLI (and API) |
+| [KeePassXC](docs/providers/keepassxc.md) | Database path, password, field |
 
-    state {
-      method   = method.external.tpmsfe
-      enforced = true
-    }
+## Requirements
 
-    plan {
-      method   = method.external.tpmsfe
-      enforced = true
-    }
-  }
-}
-```
-
-## BitWarden
-For CLI authentication, you first need to run `bw config (server https://bitwarden.self.hosted)`
-
-Then run `bw login` and copy the export command.
-
-You can now `export BW_SESSION="Your_Session"`, `export TPMSFE_BW_SESSION="Your_Session"` or provide the session via the `--bw-session` but this is not recommended.
-
-### Terraform snippet for configuration (CLI):
-```tf
-terraform {
-  encryption {
-    method "external" "tpmsfe" {
-      encrypt_command = [
-        "tpmsfe",
-        "--provider", "bitwarden",
-        "--bw-auth", "cli",
-        "--vault", "Your Vault",
-        "--title", "Your Item"
-      ]
-      
-      decrypt_command = [
-        "tpmsfe",
-        "--provider", "bitwarden",
-        "--bw-auth", "cli",
-        "--vault", "Your Vault",
-        "--title", "Your Item"
-      ]
-    }
-
-    state {
-      method   = method.external.tpmsfe
-      enforced = true
-    }
-
-    plan {
-      method   = method.external.tpmsfe
-      enforced = true
-    }
-  }
-}
-```
-
-### Terraform snippet for configuration (API):
-#### This is not tested, since Vaultwarden only supports the client API
-```tf
-terraform {
-  encryption {
-    method "external" "tpmsfe" {
-      encrypt_command = [
-        "tpmsfe",
-        "--provider", "bitwarden",
-        "--bw-auth", "api",
-        // For self-hosted or bitwarden.eu
-        // "--bw-api-url", "https://bitwarden.eu",
-        "--bw-client-id", "Your Client ID",
-        // The client ID can als be provided with the environment variables TPMSFE_BW_CLIENT_ID or BW_CLIENT_ID
-        // Not recommended:
-        // "--bw-access-token", "your-access-token"
-        // Consider using either of the environment variables TPMSFE_BW_ACCESS_TOKEN or BW_ACCESS_TOKEN
-        "--vault", "Your Vault",
-        "--title", "Your Item"
-      ]
-      
-      decrypt_command = [
-        "tpmsfe",
-        "--provider", "bitwarden",
-        "--bw-auth", "api",
-        // For self-hosted or bitwarden.eu
-        // "--bw-api-url", "https://bitwarden.eu",
-        "--bw-client-id", "Your Client ID",
-        // The client ID can als be provided with the environment variables TPMSFE_BW_CLIENT_ID or BW_CLIENT_ID
-        // Not recommended:
-        // "--bw-access-token", "your-access-token"
-        // Consider using either of the environment variables TPMSFE_BW_ACCESS_TOKEN or BW_ACCESS_TOKEN
-        "--vault", "Your Vault",
-        "--title", "Your Item"
-      ]
-    }
-
-    state {
-      method   = method.external.tpmsfe
-      enforced = true
-    }
-
-    plan {
-      method   = method.external.tpmsfe
-      enforced = true
-    }
-  }
-}
-```
-## KeePassXC
-### Terraform snippet for configuration:
-```tf
-terraform {
-  encryption {
-    method "external" "tpmsfe" {
-      encrypt_command = [
-        "tpmsfe",
-        "--provider", "keepassxc",
-        // Not recommended:
-        // "--kx-password", "your-database-password"
-        // Consider using either of the environment variables  TPMSFE_KEEPASSXC_PASSWORD or  KEEPASSXC_PASSWORD
-        "--title", "Your Item",
-      ]
-      
-      decrypt_command = [
-        "tpmsfe",
-        "--provider", "keepassxc",
-        // Not recommended:
-        // "--kx-password", "your-database-password"
-        // Consider using either of the environment variables  TPMSFE_KEEPASSXC_PASSWORD or  KEEPASSXC_PASSWORD
-        "--title", "Your Item",
-      ]
-    }
-
-    state {
-      method   = method.external.tpmsfe
-      enforced = true
-    }
-
-    plan {
-      method   = method.external.tpmsfe
-      enforced = true
-    }
-  }
-}
-
-```
+- **OpenTofu** or **Terraform** with support for external encryption (e.g. OpenTofu 1.8+).
+- **Go 1.25+** for building from source; `CGO_ENABLED=1` for KeePassXC support.
+- One of: **1Password** (CLI/Connect/Service Account), **Bitwarden** (CLI or API), or **KeePassXC** (CLI and `.kdbx`).
