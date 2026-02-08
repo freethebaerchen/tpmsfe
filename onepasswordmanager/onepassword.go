@@ -14,7 +14,7 @@ func FetchSecret(config Config) (string, error) {
 	case "service-account":
 		return fetchServiceAccount(config)
 	default:
-		return "", ErrUnsupportedMethod
+		return "", ErrAuthMethodRequired
 	}
 }
 
