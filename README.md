@@ -71,3 +71,7 @@ Full documentation is in the [docs](docs/README.md) directory:
 - **OpenTofu** or **Terraform** with support for external encryption (e.g. OpenTofu 1.8+).
 - **Go 1.25+** for building from source; `CGO_ENABLED=1` for KeePassXC support.
 - One of: **1Password** (CLI/Connect/Service Account), **Bitwarden** (CLI or API), or **KeePassXC** (CLI and `.kdbx`).
+
+## License
+
+[Mozilla Public License v2.0](https://github.com/freethebaerchen/tpmsfe/blob/main/LICENSE)
